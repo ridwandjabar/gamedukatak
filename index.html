@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Katak Pintar: Multimedia Pembelajaran Interaktif Matematika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800&display=swap');
+
+        :root {
+            --water-color: #4facfe;
+            --water-dark: #00f2fe;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        h1, h2, .font-heading {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .water-bg {
+            background: linear-gradient(180deg, var(--water-color) 0%, var(--water-dark) 100%);
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Lily Pad SVG Design */
+        .lily-pad {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .lily-pad:active {
+            transform: scale(0.9);
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .frog {
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.4));
+            z-index: 50;
+            transform-origin: bottom center;
+        }
+
+        /* Animations */
+        .jump-anim {
+            animation: jumpArc 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes jumpArc {
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.2) translateY(-40px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        .sink-anim {
+            animation: sink 0.8s forwards;
+        }
+
+        @keyframes sink {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(15deg); opacity: 0.8; filter: blur(2px); }
+            100% { transform: scale(0) rotate(45deg); opacity: 0; filter: blur(5px); }
+        }
+
+        .pad-sink {
+            animation: padSinkAnim 0.5s forwards;
+        }
+
+        @keyframes padSinkAnim {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(50px) scale(0.8); opacity: 0; }
+        }
+
+        /* Ambient Grass Effects */
+        .grass-layer {
+            position: absolute;
+            bottom: -5px;
+            left: -5%;
+            width: 110%;
+            background-repeat: repeat-x;
+            background-position: bottom left;
+            pointer-events: none;
+            transform-origin: bottom center;
+        }
+
+        .grass-back {
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0%25' stop-color='%23064e3b'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,100 L5,40 L12,100 L20,20 L28,100 L35,50 L42,100 L50,15 L58,100 L65,60 L72,100 L80,25 L88,100 L95,45 L102,100 L110,10 L118,100 L125,55 L132,100 L140,30 L148,100 L155,70 L162,100 L170,20 L178,100 L185,40 L192,100 L200,30 L200,100 Z' fill='url(%23g1)'/%3E%3C/svg%3E");
+            background-size: 150px 100%;
+            animation: swayGrass 6s infinite alternate ease-in-out;
+        }
+
+        .grass-front {
+            height: 70%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0%25' stop-color='%2314532d'/%3E%3Cstop offset='100%25' stop-color='%234ade80'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,100 L8,60 L15,100 L25,40 L35,100 L45,70 L55,100 L65,45 L75,100 L85,30 L95,100 L105,65 L115,100 L125,35 L135,100 L145,55 L155,100 L165,25 L175,100 L185,60 L195,100 L200,80 L200,100 Z' fill='url(%23g2)'/%3E%3C/svg%3E");
+            background-size: 120px 100%;
+            animation: swayGrass 4s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes swayGrass {
+            0% { transform: skewX(-4deg); }
+            100% { transform: skewX(4deg); }
+        }
+
+        .water-surface {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 60%);
+            animation: pulseWater 4s infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes pulseWater { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
+
+        #effectsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 65;
+        }
+
+        .layout-solo { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+        .layout-duel { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+        .layout-squad { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr; }
+
+        @media (max-width: 768px) {
+            .layout-duel { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+            .layout-squad { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        /* Hero Split Layout */
+        .hero-split-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (min-width: 1024px) {
+            .hero-split-container {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative">
+
+    <div class="water-surface z-0"></div>
+
+    <!-- Kontrol Global -->
+    <div class="absolute top-2 right-2 z-[100] flex gap-2">
+        <button id="btnBgm" class="bg-white/80 p-3 rounded-full shadow-lg hover:bg-white text-xl" title="Toggle Musik">🔈</button>
+        <button id="btnFullscreen" class="bg-white/80 p-3 rounded-full shadow-lg hover:bg-white text-xl" title="Layar Penuh">🔲</button>
+        <button id="btnHome" class="bg-white/80 p-3 rounded-full shadow-lg hover:bg-white text-xl hidden" title="Menu Utama">🏠</button>
+    </div>
+
+    <!-- Menu Utama Split-Screen -->
+    <div id="mainMenu" class="absolute inset-0 z-[80] backdrop-blur-[6px] flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
+        <div class="hero-split-container relative w-full h-full">
+            
+            <!-- Sisi Kiri: Visual Logo & Katak Pahlawan -->
+            <div class="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-12 order-1 lg:border-r border-white/10">
+                <!-- Logo Katak Pintar (Diturunkan) -->
+                <img src="https://i.imgur.com/CKQ7FF4.png" 
+                     referrerpolicy="no-referrer" 
+                     class="w-full max-w-[280px] md:max-w-[400px] lg:max-w-[500px] h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.3)] mt-16 lg:mt-24 mb-8" 
+                     alt="Katak Pintar Logo">
+                
+                <!-- Gambar Katak Pahlawan -->
+                <div class="relative group">
+                    <img src="https://i.imgur.com/NoV4Od2.png" 
+                         referrerpolicy="no-referrer" 
+                         class="w-56 h-56 md:w-72 md:h-72 lg:w-[420px] lg:h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(74,222,128,0.4)] animate-bounce" 
+                         style="animation-duration: 4s;"
+                         alt="Katak Pahlawan">
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-40 h-6 bg-black/20 rounded-[100%] blur-xl -z-10 scale-x-150"></div>
+                </div>
+            </div>
+
+            <!-- Sisi Kanan: Menu Navigasi -->
+            <div class="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 order-2 text-center lg:text-left bg-black/5 lg:bg-transparent">
+                <div class="w-full max-w-sm">
+                    <p class="text-xl md:text-2xl text-white mb-8 font-bold tracking-wide lg:ml-2" style="text-shadow: 0 2px 8px rgba(0,0,0,0.6);">Pilih mode game kamu !</p>
+                    
+                    <div class="space-y-3 w-full">
+                        <button onclick="startGame(1)" class="group w-full bg-green-500 hover:bg-green-600 text-white font-heading text-xl py-3 rounded-xl shadow-[0_5px_0_#166534] active:shadow-[0_0px_0_#166534] active:translate-y-[5px] transition-all flex items-center justify-center gap-3">
+                            <span class="text-2xl transition-transform group-hover:scale-125">👤</span> SOLO MODE
+                        </button>
+                        <button onclick="startGame(2)" class="group w-full bg-blue-500 hover:bg-blue-600 text-white font-heading text-xl py-3 rounded-xl shadow-[0_5px_0_#1e3a8a] active:shadow-[0_0px_0_#1e3a8a] active:translate-y-[5px] transition-all flex items-center justify-center gap-3">
+                            <span class="text-2xl transition-transform group-hover:scale-125">⚔️</span> DUEL MODE
+                        </button>
+                        <button onclick="startGame(4)" class="group w-full bg-purple-500 hover:bg-purple-600 text-white font-heading text-xl py-3 rounded-xl shadow-[0_5px_0_#4c1d95] active:shadow-[0_0px_0_#4c1d95] active:translate-y-[5px] transition-all flex items-center justify-center gap-3">
+                            <span class="text-2xl transition-transform group-hover:scale-125">🛡️</span> SQUAD MODE
+                        </button>
+                        
+                        <button onclick="getFrogFact()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-heading text-lg py-3 rounded-xl shadow-[0_5px_0_#ca8a04] active:shadow-[0_0px_0_#ca8a04] active:translate-y-[5px] transition-all mt-6 border-2 border-yellow-200">
+                            🐸 Fakta Unik Katak ✨
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teks Copyright (Paling Bawah & Center dengan Kontras Tinggi) -->
+            <p class="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs md:text-sm text-slate-900 font-extrabold tracking-widest uppercase z-[110]" 
+               style="text-shadow: 1px 1px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(255,255,255,0.8), 1px -1px 0px rgba(255,255,255,0.8), -1px 1px 0px rgba(255,255,255,0.8);">
+                Copyright Ridwan Djabar 2026
+            </p>
+        </div>
+    </div>
+
+    <!-- AI Modal -->
+    <div id="aiModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl transform scale-100 transition-all text-center relative border-4 border-green-400">
+            <button onclick="UI.hideAIModal()" class="absolute top-2 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition-colors">&times;</button>
+            <div id="aiModalIcon" class="mb-4 animate-bounce flex justify-center items-center gap-2">
+                <img src="https://i.imgur.com/NoV4Od2.png" referrerpolicy="no-referrer" class="w-16 h-16 object-contain" alt="Guru Katak">
+                <span class="text-3xl">✨</span>
+            </div>
+            <h3 class="font-heading text-green-600 text-2xl mb-4">Guru Katak Berkata:</h3>
+            <div id="aiModalContent" class="text-gray-700 font-semibold text-lg md:text-xl leading-relaxed min-h-[60px]">...</div>
+            <div id="aiModalLoader" class="mt-4 hidden">
+                <div class="flex justify-center items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Grid Kontainer -->
+    <div id="gameGrid" class="absolute inset-0 z-[50] grid hidden overflow-hidden"></div>
+
+    <!-- Global Grass Layer -->
+    <div id="globalGrass" class="absolute bottom-0 left-0 w-full h-24 md:h-32 lg:h-40 pointer-events-none z-[60] overflow-hidden">
+        <div class="grass-layer grass-back opacity-50"></div>
+        <div class="grass-layer grass-front"></div>
+    </div>
+
+    <canvas id="effectsCanvas"></canvas>
+
+    <script>
+        const apiKey = ""; 
+        
+        const GeminiAPI = {
+            async generateText(prompt, systemInstruction = "Kamu adalah Guru Katak yang ramah, lucu, dan suka membantu anak SD belajar. Selalu gunakan sapaan ramah.") {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemInstruction }] }
+                };
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        const data = await response.json();
+                        let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, Guru Katak sedang tidur siang di atas daun. 🐸💤";
+                        return text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                    } catch (err) {
+                        await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                    }
+                }
+                return "Koneksi ke kolam ajaib sedang terganggu hujan deras. Coba lagi nanti! 🌧️";
+            }
+        };
+
+        const UI = {
+            showAIModal(textHtml, isLoading = false) {
+                const modal = document.getElementById('aiModal');
+                const content = document.getElementById('aiModalContent');
+                const loader = document.getElementById('aiModalLoader');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                content.innerHTML = textHtml;
+                if(isLoading) { loader.classList.remove('hidden'); } else { loader.classList.add('hidden'); }
+            },
+            hideAIModal() {
+                const modal = document.getElementById('aiModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        async function getFrogFact() {
+            UI.showAIModal("Menyelam mencari fakta seru... 🌿✨", true);
+            const prompt = "Berikan SATU fakta amfibi unik untuk anak SD. Maks 2 kalimat.";
+            const response = await GeminiAPI.generateText(prompt, "Kamu adalah Guru Katak lucu.");
+            UI.showAIModal(response, false);
+        }
+
+        const AudioSys = {
+            ctx: null, bgmOsc: null, bgmGain: null, isBgmOn: false, isPlaying: false,
+            init() { if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } },
+            playTone(freq, type, duration, vol=0.1) {
+                if (!this.ctx || !this.isBgmOn) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + duration);
+            },
+            toggleBGM() {
+                this.init(); this.isBgmOn = !this.isBgmOn; document.getElementById('btnBgm').textContent = this.isBgmOn ? '🔊' : '🔈';
+                if (this.isBgmOn && !this.isPlaying) { this.startBGM(); } else if (!this.isBgmOn && this.isPlaying) { this.stopBGM(); }
+            },
+            startBGM() {
+                if(!this.ctx) return; this.isPlaying = true;
+                this.bgmInterval = setInterval(() => { if(this.isBgmOn) { this.playTone(Math.random() * 200 + 400, 'triangle', 0.1, 0.05); } }, 2000);
+            },
+            stopBGM() { this.isPlaying = false; clearInterval(this.bgmInterval); }
+        };
+
+        const FX = {
+            canvas: null, ctx: null, particles: [], ripples: [], ambientRain: [], ambientRipples: [], isRaining: false, rainTimer: null,
+            init() {
+                this.canvas = document.getElementById('effectsCanvas'); this.ctx = this.canvas.getContext('2d'); this.resize();
+                window.addEventListener('resize', () => this.resize());
+                for(let i=0; i<150; i++) { this.ambientRain.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, len: Math.random() * 15 + 10, speed: Math.random() * 10 + 15 }); }
+                this.loop();
+            },
+            resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
+            triggerRainAndRipple(x, y) {
+                this.ripples.push({ x, y, radius: 0, alpha: 1 }); this.isRaining = true; if(this.rainTimer) clearTimeout(this.rainTimer);
+                this.rainTimer = setTimeout(() => { this.isRaining = false; }, 2000);
+            },
+            loop() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; this.ctx.lineWidth = 1.5; this.ctx.beginPath();
+                for (let p of this.ambientRain) { this.ctx.moveTo(p.x, p.y); this.ctx.lineTo(p.x, p.y + p.len); p.y += p.speed; if (p.y > this.canvas.height) { p.y = -p.len; p.x = Math.random() * this.canvas.width; } }
+                this.ctx.stroke();
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    let r = this.ripples[i]; this.ctx.beginPath(); this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${r.alpha})`; this.ctx.lineWidth = 3; this.ctx.stroke();
+                    r.radius += 2; r.alpha -= 0.02; if (r.alpha <= 0) this.ripples.splice(i, 1);
+                }
+                requestAnimationFrame(() => this.loop());
+            }
+        };
+
+        const MathLogic = {
+            generateQuestion() {
+                const isMultiplication = Math.random() > 0.5; let num1, num2, answer, questionText;
+                if (isMultiplication) {
+                    num1 = Math.floor(Math.random() * 10) + 1; num2 = Math.floor(Math.random() * 5) + 1; answer = num1 * num2; questionText = `${num1} × ${num2} = ?`;
+                } else {
+                    let divisor = Math.floor(Math.random() * 10) + 1; answer = Math.floor(Math.random() * 10) + 1; num1 = divisor * answer; num2 = divisor; questionText = `${num1} ÷ ${num2} = ?`;
+                }
+                let options = new Set([answer]); while (options.size < 4) {
+                    let offset = Math.floor(Math.random() * 6) + 1; let wrong = Math.random() > 0.5 ? answer + offset : answer - offset;
+                    if (wrong >= 0 && wrong !== answer) { options.add(wrong); }
+                }
+                return { questionText, answer, options: Array.from(options).sort(() => Math.random() - 0.5) };
+            }
+        };
+
+        class PlayerInstance {
+            constructor(id, color, name, mode) { this.id = id; this.color = color; this.name = name; this.mode = mode; this.score = 0; this.currentData = null; this.isAnimating = false; this.container = this.buildUI(); }
+            buildUI() {
+                const div = document.createElement('div'); div.className = `water-bg relative flex flex-col items-center justify-between p-4 border-2 border-white/20 overflow-hidden h-full`;
+                div.innerHTML = `<div class="water-surface"></div>
+                <div class="w-full flex justify-between z-20 glass-panel px-4 py-2 rounded-xl text-center"><span class="font-heading text-slate-800">${this.name}</span><span class="font-heading text-green-700">Skor: <span id="score-${this.id}">0</span></span></div>
+                <div class="z-20 w-full relative"><button id="hintBtn-${this.id}" class="absolute -top-3 -right-2 bg-yellow-400 text-white p-2 rounded-full shadow-lg z-30">💡</button><div class="bg-white/90 px-4 py-3 rounded-xl shadow-lg"><h2 id="qText-${this.id}" class="text-2xl md:text-3xl text-gray-800 text-center">...</h2></div></div>
+                <div id="pond-${this.id}" class="flex-1 w-full relative mt-4 flex items-center justify-center pb-32 md:pb-40"></div>`;
+                const pond = div.querySelector(`#pond-${this.id}`);
+                const padsGrid = document.createElement('div'); padsGrid.className = this.mode === 1 ? "grid grid-cols-4 gap-4 z-10" : "grid grid-cols-2 gap-4 z-10";
+                for(let i=0; i<4; i++) {
+                    const pad = document.createElement('div'); pad.className = "lily-pad relative w-16 h-16 md:w-24 md:h-24 flex items-center justify-center floating";
+                    pad.onclick = (e) => this.checkAnswer(i, e);
+                    pad.innerHTML = `<svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full drop-shadow-lg"><defs><radialGradient id="padGrad${this.id}${i}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#86efac" /><stop offset="100%" stop-color="#15803d" /></radialGradient></defs><path d="M50,55 L35,100 C10,90 0,60 5,35 C10,10 35,0 55,5 C85,10 100,35 95,65 C90,90 65,100 50,55 Z" fill="url(#padGrad${this.id}${i})" stroke="#14532d" stroke-width="2"/></svg><span id="opt-${this.id}-${i}" class="relative z-10 font-heading text-xl md:text-2xl text-white">0</span>`;
+                    padsGrid.appendChild(pad);
+                }
+                const homePad = document.createElement('div'); homePad.className = "absolute bottom-12 left-1/2 -translate-x-1/2 w-20 h-20 md:w-28 md:h-28 z-10 flex justify-center items-center";
+                homePad.innerHTML = `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-lg"><path d="M50,55 L35,100 C10,90 0,60 5,35 C10,10 35,0 55,5 C85,10 100,35 95,65 C90,90 65,100 50,55 Z" fill="#4ade80" stroke="#064e3b" stroke-width="2"/></svg>`;
+                const frog = document.createElement('div'); frog.id = `frog-${this.id}`; frog.className = "frog absolute bottom-14 md:bottom-24 left-1/2 -translate-x-1/2 w-20 h-20 md:w-28 md:h-28 z-[50]";
+                frog.innerHTML = `<img src="https://i.imgur.com/0r0frpG.png" class="w-full h-full object-contain">`;
+                pond.appendChild(padsGrid); pond.appendChild(homePad); pond.appendChild(frog); return div;
+            }
+            mount(parent) { parent.appendChild(this.container); this.loadNextQuestion(); setTimeout(() => this.resetFrogPosition(), 100); this.container.querySelector(`#hintBtn-${this.id}`).onclick = () => this.askHint(); }
+            async askHint() { UI.showAIModal("Guru Katak sedang memikirkan petunjuk untukmu... 💡✨", true); const prompt = `Berikan petunjuk singkat matematika untuk soal: ${this.currentData.questionText}. JANGAN sebutkan jawabannya.`; const response = await GeminiAPI.generateText(prompt); UI.showAIModal(response, false); }
+            resetFrogPosition() { const frog = document.getElementById(`frog-${this.id}`); if(frog) { frog.style.transform = `translateX(-50%) translate(0px, 0px)`; frog.classList.remove('sink-anim', 'jump-anim'); frog.style.opacity = 1; } }
+            loadNextQuestion() { this.currentData = MathLogic.generateQuestion(); document.getElementById(`qText-${this.id}`).innerText = this.currentData.questionText; for(let i=0; i<4; i++) { document.getElementById(`opt-${this.id}-${i}`).innerText = this.currentData.options[i]; } }
+            checkAnswer(index, event) {
+                if(this.isAnimating) return; this.isAnimating = true; const isCorrect = this.currentData.options[index] === this.currentData.answer;
+                const frog = document.getElementById(`frog-${this.id}`); const targetPad = event.currentTarget; const rectFrog = frog.getBoundingClientRect(); const rectPad = targetPad.getBoundingClientRect();
+                const transX = rectPad.left + (rectPad.width/2) - (rectFrog.left + (rectFrog.width/2)); const transY = rectPad.top + (rectPad.height/2) - (rectFrog.top + (rectFrog.height/2)); 
+                frog.style.transform = `translateX(-50%) translate(${transX}px, ${transY}px)`; frog.classList.add('jump-anim');
+                setTimeout(() => {
+                    if (isCorrect) { this.score += 10; document.getElementById(`score-${this.id}`).innerText = this.score; setTimeout(() => { this.resetFrogPosition(); this.loadNextQuestion(); this.isAnimating = false; }, 500); }
+                    else { AudioSys.playSplash(); frog.classList.add('sink-anim'); FX.triggerRainAndRipple(rectPad.left+rectPad.width/2, rectPad.top+rectPad.height/2); setTimeout(() => { this.resetFrogPosition(); this.isAnimating = false; }, 1000); }
+                }, 500); 
+            }
+        }
+
+        const GameManager = {
+            init() {
+                document.getElementById('btnBgm').addEventListener('click', () => AudioSys.toggleBGM());
+                document.getElementById('btnHome').addEventListener('click', () => this.showMenu());
+                document.getElementById('btnFullscreen').addEventListener('click', async () => {
+                    try { if (!document.fullscreenElement) { await document.documentElement.requestFullscreen(); } else { await document.exitFullscreen(); } } catch (err) { UI.showAIModal("Izin Layar Penuh Ditolak 🛡️", false); }
+                });
+                FX.init();
+            },
+            start(mode) {
+                AudioSys.init(); const menu = document.getElementById('mainMenu'); const grid = document.getElementById('gameGrid'); const btnHome = document.getElementById('btnHome');
+                menu.style.display = 'none'; grid.style.display = 'grid'; grid.innerHTML = '';
+                btnHome.classList.remove('hidden');
+                grid.className = 'absolute inset-0 z-[50] grid overflow-hidden';
+                if (mode === 1) grid.classList.add('grid-cols-1'); else if (mode === 2) grid.classList.add('grid-cols-1', 'lg:grid-cols-2'); else grid.classList.add('grid-cols-2', 'lg:grid-cols-4');
+                for(let i=0; i<mode; i++) { new PlayerInstance(i+1, '', `Pemain ${i+1}`, mode).mount(grid); }
+                setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+            },
+            showMenu() {
+                const menu = document.getElementById('mainMenu'); const grid = document.getElementById('gameGrid'); const btnHome = document.getElementById('btnHome');
+                menu.style.display = 'flex'; grid.style.display = 'none'; btnHome.classList.add('hidden'); grid.innerHTML = '';
+            }
+        };
+
+        window.startGame = (mode) => { GameManager.start(mode); };
+        window.onload = () => { GameManager.init(); };
+    </script>
+</body>
+</html>
